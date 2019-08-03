@@ -1,29 +1,12 @@
+
+
+
+
+
+
 # MINST手写数字识别
 
-- [MINST手写数字识别](#minst------)
-  * [minst数据集](#minst---)
-    + [图片](#--)
-    + [标签](#--)
-    + [one-hot编码(独热编码)](#one-hot--------)
-  * [Keras神经网络](#keras----)
-    + [输入/输出/标签](#--------)
-    + [损失函数 -> 交叉熵](#-----------)
-    + [回归模型](#----)
-    + [学习速率](#----)
-    + [激活函数 -> softmax](#--------softmax)
-    + [具体实现](#----)
-      - [下载该数据集](#------)
-      - [导入依赖](#----)
-      - [装载训练数据](#------)
-        * [查看训练集中的例子](#---------)
-      - [格式化训练数据](#-------)
-      - [搭建神经网络](#------)
-        * [搭建三层全相连网络](#---------)
-        * [编译模型](#----)
-        * [训练模型](#----)
-        * [性能评估](#----)
-      - [检查输出](#----)
-
+[TOC]
 
 ## minst数据集
 
@@ -59,6 +42,11 @@
 - 能够处理非连续性数值特征
 - 一定程度上扩充了特征(性别本身是一个特征, 经过编码以后, 就变成了男或女两个特征)
 - 容错性: 比如神经网络的输出结果是 [0,0.1,0.2,0.7,0,0,0,0,0, 0]转成独热编码后，表示数字3。即值最大的地方变为1，其余均为0。[0,0.1,0.4,0.5,0,0,0,0,0, 0]也能表示数字3。
+
+### 下载该数据集
+
+- 在官网上下载`mnist.npz`数据集
+- 将其放于`~/.keras/datasets/mnist.npz`中
 
 ## Keras神经网络
 
@@ -121,14 +109,9 @@ softmax([4, 5, 10])
 # [ 0.002,  0.007,  0.991]
 ```
 
-### 具体实现
+## MLP多层神经网络
 
-#### 下载该数据集
-
-- 在官网上下载`mnist.npz`数据集
-- 将其放于`~/.keras/datasets/mnist.npz`中
-
-#### 导入依赖
+### 导入依赖
 
 ```python
 import numpy as np
@@ -149,7 +132,7 @@ Dropout: 在训练过程中每次更新参数时按一定概率随机断开输�
 Using TensorFlow backend.
 ```
 
-#### 装载训练数据
+### 装载训练数据
 
 通过keras自带的数据集mnist导入数据, 对其进行归一化处理, 并将原而为数据变成一位数据, 作为网络的输入
 
@@ -172,7 +155,7 @@ y_train original shape (60000,)
 X_train是list类型的对象, 存储的是28*28的图像像素   
 Y_train存储的是图像对应的标签(也就是该图片代表什么数字)
 
-##### 查看训练集中的例子
+#### 查看训练集中的例子
 
 ```python
 for i in range(9):
@@ -183,7 +166,7 @@ for i in range(9):
 
 ![output_6_0.png](https://upload-images.jianshu.io/upload_images/12014150-eba549ecc2c04684.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-#### 格式化训练数据
+### 格式化训练数据
 
 对于每一个训练样本, 我们的神经网络的到单个的数组
 
@@ -228,9 +211,9 @@ Y_train = np_utils.to_categorical(y_train, nb_classes)
 Y_test = np_utils.to_categorical(y_test, nb_classes)
 ```
 
-#### 搭建神经网络
+### 搭建神经网络
 
-##### 搭建三层全相连网络
+#### 搭建三层全相连网络
 
 <img src="https://upload-images.jianshu.io/upload_images/12014150-db9f8bbfa9a48a3a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240"/>
 
@@ -271,7 +254,7 @@ model.add(Activation('softmax')) # This special "softmax" activation among other
                                  # that its values are all non-negative and sum to 1.
 ```
 
-##### 编译模型
+#### 编译模型
 
 训练模型之前, 需要通过编译对学习过程进行配置
 
@@ -289,7 +272,7 @@ model.add(Activation('softmax')) # This special "softmax" activation among other
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 ```
 
-##### 训练模型
+#### 训练模型
 
 ```python
 '''
@@ -317,7 +300,7 @@ Epoch 4/4
 60000/60000 [==============================] - 3s 52us/step - loss: 0.0573 - acc: 0.9814 - val_loss: 0.0798 - val_acc: 0.9746
 ```
 
-##### 性能评估
+#### 性能评估
 
 ```python
 score = model.evaluate(X_test, Y_test, verbose=0)
@@ -330,7 +313,7 @@ Test score: 0.07981417043644469
 Test accuracy: 0.9746
 ```
 
-#### 检查输出
+### 检查输出
 
 - 正确的例子
 - 错误的例子
@@ -365,14 +348,251 @@ for i, incorrect in enumerate(incorrect_indices[:9]):
 
 
 
+## CNN卷积神经网络
+
+### 导入依赖
+
+```python
+from __future__ import print_function
+import keras
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+from keras import backend as K
+
+batch_size = 128
+num_classes = 10
+epochs = 12
+
+# input image dimensions
+img_rows, img_cols = 28, 28
+```
+
+```
+Using TensorFlow backend.
+```
+
+### 装载训练数据
+
+```python
+# the data, split between train and test sets
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+if K.image_data_format() == 'channels_first':
+    x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
+    x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
+    input_shape = (1, img_rows, img_cols)
+else:
+    x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
+    x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+    input_shape = (img_rows, img_cols, 1)
+```
+
+### 格式化训练数据
+
+```python
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+x_train /= 255
+x_test /= 255
+print('x_train shape:', x_train.shape)
+print(x_train.shape[0], 'train samples')
+print(x_test.shape[0], 'test samples')
+```
+
+```
+x_train shape: (60000, 28, 28, 1)
+60000 train samples
+10000 test samples
+```
 
 
 
+```python
+# convert class vectors to binary class matrices
+y_train = keras.utils.to_categorical(y_train, num_classes)
+y_test = keras.utils.to_categorical(y_test, num_classes)
+```
 
-在第一个tuple训练完后，我们可以把第二个tuple利用神经网络进行分类，根据实验结果的真实值与我们的预测值进行对比得到相应的损失值，再利用反向传播进行参数更新，再进行分类，然后重复前述步骤直至损失值最小
+### 搭建神经网络
 
+#### 搭建卷积神经网络
 
+模型的定义主要适用的keras.layers提供的`Conv2D`(卷积) 与 `MaxPooling2D`(池化)函数
+CNN的输入是维度为(image_height, image_width, color_channels)的张亮
+对于mnist数据集, 输入的张亮维度就是(28, 28, 1), 通过参数input_shape传给网络的第一层
 
+```python
+model = Sequential()
 
-![image-20190731194915115.png](https://upload-images.jianshu.io/upload_images/12014150-3f302abe4e10ffdc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+# 第一层: 卷积层, 有32个滤波器, 卷积核大小为3*3, 32个, 第一层要输入训练图片的规模
+model.add(Conv2D(32, kernel_size=(3, 3),
+                 activation='relu',
+                 input_shape=input_shape))
+
+# 第二层: 卷积层, 卷积核大小为3*3 64个
+model.add(Conv2D(64, (3, 3), activation='relu'))
+
+# 第三层: 池化层, 使用MaxPooling, 大小为2*2
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# 第四层: Dropout层, 对参数进行正则化防止模型过拟合
+model.add(Dropout(0.25))
+
+# 第五层: 将三维张亮转换为一维向量, 展开前张亮的维度是(12,12,64), 转化为一维(9216)
+model.add(Flatten())
+
+# 使用Dense构建了2层全相连层, 逐步将一位向量的位数从9216变为128, 最终变为10
+# 第六层: 全向量层, 有128个神经元, 激活函数采用‘relu’
+model.add(Dense(128, activation='relu'))
+# 第七层: 训练过程中每次更新参数时随机断开输入神经元
+model.add(Dropout(0.5))
+# 第八层: 激活函数为softmax, 10位恰好对应0~9十个数字
+model.add(Dense(num_classes, activation='softmax'))
+
+# 打印定义的模型结构
+model.summary()
+```
+
+```
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_1 (Conv2D)            (None, 26, 26, 32)        320       
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 24, 24, 64)        18496     
+_________________________________________________________________
+max_pooling2d_1 (MaxPooling2 (None, 12, 12, 64)        0         
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 12, 12, 64)        0         
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 9216)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 128)               1179776   
+_________________________________________________________________
+dropout_2 (Dropout)          (None, 128)               0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 10)                1290      
+=================================================================
+Total params: 1,199,882
+Trainable params: 1,199,882
+Non-trainable params: 0
+_________________________________________________________________
+```
+
+#### 编译模型
+
+```python
+model.compile(loss=keras.losses.categorical_crossentropy,
+              optimizer=keras.optimizers.Adadelta(),
+              metrics=['accuracy'])
+```
+
+#### 训练模型
+
+每经过一层epoch, 模型训练遍历所有样本1次
+batch_size设置为128, 即每次模型训练使用的样本数量为100
+每经过一次epoch, 模型遍历训练集的60000歌样本, 每次训练使用128个样本, 即模型训练469次, 即损失函数经过469此批量梯度下降
+
+```python
+model.fit(x_train, y_train,
+          batch_size=batch_size,
+          epochs=epochs,
+          verbose=1,
+          validation_data=(x_test, y_test))
+```
+
+```
+Train on 60000 samples, validate on 10000 samples
+Epoch 1/12
+60000/60000 [==============================] - 49s 813us/step - loss: 0.2657 - acc: 0.9191 - val_loss: 0.0558 - val_acc: 0.9811
+Epoch 2/12
+60000/60000 [==============================] - 50s 830us/step - loss: 0.0863 - acc: 0.9751 - val_loss: 0.0402 - val_acc: 0.9869
+Epoch 3/12
+60000/60000 [==============================] - 53s 892us/step - loss: 0.0654 - acc: 0.9806 - val_loss: 0.0360 - val_acc: 0.9876
+Epoch 4/12
+60000/60000 [==============================] - 53s 890us/step - loss: 0.0547 - acc: 0.9833 - val_loss: 0.0306 - val_acc: 0.9888
+Epoch 5/12
+60000/60000 [==============================] - 52s 864us/step - loss: 0.0469 - acc: 0.9859 - val_loss: 0.0306 - val_acc: 0.9884
+Epoch 6/12
+60000/60000 [==============================] - 50s 834us/step - loss: 0.0425 - acc: 0.9872 - val_loss: 0.0289 - val_acc: 0.9900
+Epoch 7/12
+60000/60000 [==============================] - 51s 850us/step - loss: 0.0373 - acc: 0.9887 - val_loss: 0.0315 - val_acc: 0.9882
+Epoch 8/12
+60000/60000 [==============================] - 52s 861us/step - loss: 0.0346 - acc: 0.9894 - val_loss: 0.0322 - val_acc: 0.9892
+Epoch 9/12
+60000/60000 [==============================] - 52s 860us/step - loss: 0.0307 - acc: 0.9905 - val_loss: 0.0269 - val_acc: 0.9910
+Epoch 10/12
+60000/60000 [==============================] - 52s 872us/step - loss: 0.0293 - acc: 0.9907 - val_loss: 0.0291 - val_acc: 0.9898
+Epoch 11/12
+60000/60000 [==============================] - 53s 882us/step - loss: 0.0277 - acc: 0.9914 - val_loss: 0.0257 - val_acc: 0.9917
+Epoch 12/12
+60000/60000 [==============================] - 52s 872us/step - loss: 0.0266 - acc: 0.9920 - val_loss: 0.0262 - val_acc: 0.9919
+```
+
+```
+<keras.callbacks.History at 0x10250cdd0>
+```
+
+#### 性能评估
+
+```python
+score = model.evaluate(x_test, y_test, verbose=0)
+print('Test loss:', score[0])
+print('Test accuracy:', score[1])
+```
+
+```
+Test loss: 0.026224144125275232
+Test accuracy: 0.9919
+
+```
+
+### 模型测试
+
+```python
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+import random
+
+'''画出单个数字'''
+def drawDigit3(position, image, title, isTrue):
+    plt.subplot(*position)    # 指定子图位置
+    plt.imshow(image.reshape(-1, 28), cmap='gray_r')    # 把数字矩阵绘制成图
+    plt.axis('off')    # 不显示坐标轴
+    
+    # 如果预测正确则标题为黑色, 否则为红色
+    if not isTrue:
+        plt.title(title, color='red')
+    else:
+        plt.title(title)
+        
+def batchDraw3(batch_size, test_X, test_y):
+    selected_index = random.sample(range(len(test_y)), k=batch_size)
+    images = test_X[selected_index]
+    labels = test_y[selected_index]
+    predict_labels = model.predict(images)
+    image_number = images.shape[0]
+    row_number = math.ceil(image_number ** 0.5)
+    column_number = row_number
+    plt.figure(figsize=(row_number+8, column_number+8))
+    for i in range(row_number):
+        for j in range(column_number):
+            index = i * column_number + j
+            if index < image_number:
+                position = (row_number, column_number, index+1)
+                image = images[index]
+                actual = np.argmax(labels[index])
+                predict = np.argmax(predict_labels[index])
+                isTrue = actual==predict
+                title = 'actual:%d\npredict:%d' %(actual,predict)
+                drawDigit3(position, image, title, isTrue)
+
+batchDraw3(20, x_test, y_test)
+plt.show()
+```
+
+![output_16_0.png](https://upload-images.jianshu.io/upload_images/12014150-b1be2986ce92cf1c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
