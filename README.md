@@ -9,7 +9,8 @@
 
 ## 仓库结构
 
-![仓库结构.jpg](https://upload-images.jianshu.io/upload_images/12014150-08b6aa6f9a11354d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![仓库结构.jpg](https://upload-images.jianshu.io/upload_images/12014150-787ea34e4610310a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 
             
 -----
