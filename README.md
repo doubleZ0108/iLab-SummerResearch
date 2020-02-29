@@ -28,7 +28,11 @@ Table of Contents
 - [MNIST手写数字识别综合项目](https://github.com/doubleZ0108/iLab-SummerResearch/tree/master/MNIST)
 - 学习资料
   - [Deep learning深度学习笔记v5.47](https://github.com/doubleZ0108/iLab-SummerResearch/blob/master/Resources/Deeplearning%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0v5.47.pdf)
-
+- 相关文档
+  - [暑假iLab实验室实习报告](https://github.com/doubleZ0108/iLab-SummerResearch/blob/master/doc/17%E6%9C%AC-%E5%BC%A0%E5%96%86-1754060-%E5%90%8C%E6%B5%8E%E5%A4%A7%E5%AD%A6ilab%E5%AE%9E%E9%AA%8C%E5%AE%A4.pdf)
+  - [同济大学软件学院学生实习鉴定表](https://github.com/doubleZ0108/iLab-SummerResearch/blob/master/doc/%E5%90%8C%E6%B5%8E%E5%A4%A7%E5%AD%A6%E8%BD%AF%E4%BB%B6%E5%AD%A6%E9%99%A2%E5%AD%A6%E7%94%9F%E5%AE%9E%E4%B9%A0%E9%89%B4%E5%AE%9A%E8%A1%A8.doc)
+  - [校内实习证明](https://github.com/doubleZ0108/iLab-SummerResearch/blob/master/doc/%E6%A0%A1%E5%86%85%E5%AE%9E%E4%B9%A0%E8%AF%81%E6%98%8E.doc)
+  
 <br/>
 
 ## 仓库结构
